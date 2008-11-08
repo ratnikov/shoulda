@@ -64,24 +64,6 @@ module ThoughtBot # :nodoc:
           assert object.errors.on(attribute), "There are no errors on #{attribute} after being set to #{value.inspect}"
           assert_contains(object.errors.on(attribute), error_message_to_expect, "when set to #{value.inspect}")
         end
-
-        def pretty_error_messages(obj)
-          obj.errors.map do |a, m| 
-            msg = "#{a} #{m}" 
-            msg << " (#{obj.send(a).inspect})" unless a.to_sym == :base
-          end
-        end
-
-        private
-
-        def get_instance_of(object_or_klass)
-          if object_or_klass.is_a?(Class)
-            klass = object_or_klass
-            instance_variable_get("@#{klass.to_s.underscore}") || klass.new
-          else
-            object_or_klass
-          end
-        end
       end
     end
   end
