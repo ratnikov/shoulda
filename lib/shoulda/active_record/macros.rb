@@ -51,7 +51,9 @@ module ThoughtBot # :nodoc:
 
           attributes.each do |attribute|
             should "require #{attribute} to be set" do
-              assert_bad_value(klass, attribute, nil, message)
+              object = get_instance_of(klass)
+              matcher = allow_blank_for(attribute).with_message(message)
+              assert_rejects(matcher, object)
             end
           end
         end

@@ -6,15 +6,13 @@ module ThoughtBot # :nodoc:
         class AttributeMatcher
           include Helpers
 
-          def initialize(attribute)
-            @attribute        = attribute
-            @value            = nil
-            @expected_message = nil 
+          def for(attribute)
+            @attribute = attribute
+            self
           end
 
-          # optional parameters
-
           def accepting_value(value)
+            @accept = true
             @value = value
             self
           end
@@ -24,32 +22,22 @@ module ThoughtBot # :nodoc:
             self
           end
 
-          # standard matcher methods
-
           def matches?(instance)
             @instance = instance
-            accepts_value?
-          end
-
-          def failure_message
-            "Expected errors to exclude #{@expected_message.inspect} #{state_expectation}, got error #{@matched_error.inspect}"
-          end
-
-          def negative_failure_message
-            "Expected errors to include #{@expected_message.inspect} #{state_expectation}, got errors: #{pretty_error_messages(@instance)}"
-          end
-
-          private
-
-          # matches? conditions
-
-          def accepts_value?
             @expected_message ||= default_error_message(:invalid)
             @instance.send("#{@attribute}=", @value)
             !errors_match?
           end
 
-          # matches? helpers
+          def failure_message
+            "Did not expect #{expectation}, got error: #{@matched_error}"
+          end
+
+          def negative_failure_message
+            "Expected #{expectation}, got errors: #{pretty_error_messages(@instance)}"
+          end
+
+          private
 
           def errors_match?
             @instance.valid?
@@ -76,15 +64,22 @@ module ThoughtBot # :nodoc:
             end
           end
 
-          # expectation helpers
-
-          def state_expectation
+          def expectation
+            "errors to include #{@expected_message.inspect} " <<
             "when #{@attribute} is set to #{@value.inspect}"
           end
         end
 
         def have_attribute(attr)
-          AttributeMatcher.new(attr)
+          AttributeMatcher.new.for(attr)
+        end
+
+        def accept_value(value)
+          AttributeMatcher.new.accepting_value(value)
+        end
+
+        def allow_blank_for(attr)
+          AttributeMatcher.new.for(attr).accepting_value(nil)
         end
       end
     end
