@@ -64,15 +64,17 @@ module ThoughtBot # :nodoc:
           end
 
           def foreign_key_exists?
-            !(belongs_to_foreign_key_missing? || has_many_foreign_key_missing?)
+            !(belongs_foreign_key_missing? || has_foreign_key_missing?)
           end
 
-          def belongs_to_foreign_key_missing?
+          def belongs_foreign_key_missing?
             @macro == :belongs_to && !class_has_foreign_key?(model_class)
           end
 
-          def has_many_foreign_key_missing?
-            @macro == :has_many && !through? && !class_has_foreign_key?(associated_class)
+          def has_foreign_key_missing?
+            [:has_many, :has_one].include?(@macro) &&
+              !through? &&
+              !class_has_foreign_key?(associated_class)
           end
 
           def through_association_valid?
@@ -121,7 +123,7 @@ module ThoughtBot # :nodoc:
           end
 
           def associated_class
-            (reflection.options[:class_name] || @name.to_s.classify).constantize
+            reflection.klass
           end
 
           def foreign_key
@@ -148,6 +150,7 @@ module ThoughtBot # :nodoc:
             case @macro.to_s
             when 'belongs_to' then 'belong to'
             when 'has_many'   then 'have many'
+            when 'has_one'    then 'has one'
             end
           end
         end
@@ -158,6 +161,10 @@ module ThoughtBot # :nodoc:
 
         def have_many(name)
           AssociationMatcher.new(:has_many, name)
+        end
+
+        def have_one(name)
+          AssociationMatcher.new(:has_one, name)
         end
 
       end
