@@ -12,7 +12,6 @@ module ThoughtBot # :nodoc:
           end
 
           def accepting_value(value)
-            @accept = true
             @value = value
             self
           end
