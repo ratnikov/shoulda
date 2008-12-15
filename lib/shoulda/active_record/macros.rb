@@ -47,7 +47,6 @@ module ThoughtBot # :nodoc:
         #
         def should_require_attributes(*attributes)
           message = get_options!(attributes, :message)
-          message ||= default_error_message(:blank)
           klass = model_class
 
           attributes.each do |attribute|
@@ -76,36 +75,13 @@ module ThoughtBot # :nodoc:
         def should_require_unique_attributes(*attributes)
           message, scope = get_options!(attributes, :message, :scoped_to)
           scope = [*scope].compact
-          message ||= default_error_message(:taken)
-
           klass = model_class
+
           attributes.each do |attribute|
-            attribute = attribute.to_sym
-            should "require unique value for #{attribute}#{" scoped to #{scope.join(', ')}" unless scope.blank?}" do
-              assert existing = klass.find(:first), "Can't find first #{klass}"
-              object = klass.new
-              existing_value = existing.send(attribute)
-
-              if !scope.blank?
-                scope.each do |s|
-                  assert_respond_to object, :"#{s}=", "#{klass.name} doesn't seem to have a #{s} attribute."
-                  object.send("#{s}=", existing.send(s))
-                end
-              end
-              assert_bad_value(object, attribute, existing_value, message)
-
-              # Now test that the object is valid when changing the scoped attribute
-              # TODO:  There is a chance that we could change the scoped field
-              # to a value that's already taken.  An alternative implementation
-              # could actually find all values for scope and create a unique
-              # one.
-              if !scope.blank?
-                scope.each do |s|
-                  # Assume the scope is a foreign key if the field is nil
-                  object.send("#{s}=", existing.send(s).nil? ? 1 : existing.send(s).next)
-                  assert_good_value(object, attribute, existing_value, message)
-                end
-              end
+            matcher = require_unique_attribute(attribute).
+              with_message(message).scoped_to(scope)
+            should matcher.description do
+              assert_accepts(matcher, klass.new)
             end
           end
         end
