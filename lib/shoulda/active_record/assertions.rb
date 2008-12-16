@@ -35,7 +35,7 @@ module ThoughtBot # :nodoc:
         #   assert_good_value(Product, :price, "0")
         def assert_good_value(object_or_klass, attribute, value, error_message_to_avoid = nil)
           object = get_instance_of(object_or_klass)
-          matcher = accept_value(value).
+          matcher = allow_value(value).
                       for(attribute).
                       with_message(error_message_to_avoid)
           assert_accepts(matcher, object)
@@ -60,7 +60,7 @@ module ThoughtBot # :nodoc:
         def assert_bad_value(object_or_klass, attribute, value,
                              error_message_to_expect = nil)
           object = get_instance_of(object_or_klass)
-          matcher = accept_value(value).
+          matcher = allow_value(value).
                       for(attribute).
                       with_message(error_message_to_expect)
           assert_rejects(matcher, object)

@@ -3,16 +3,15 @@ module ThoughtBot # :nodoc:
     module ActiveRecord # :nodoc:
       module Matchers # :nodoc:
 
-        class AttributeMatcher
+        class AllowValueMatcher
           include Helpers
+
+          def initialize(value)
+            @value = value
+          end
 
           def for(attribute)
             @attribute = attribute
-            self
-          end
-
-          def accepting_value(value)
-            @value = value
             self
           end
 
@@ -114,8 +113,8 @@ module ThoughtBot # :nodoc:
           end
 
           def failure_message
-            if @accept_value
-              @accept_value.failure_message
+            if @allow_value
+              @allow_value.failure_message
             else
               if @existing
                 if @reject_value
@@ -130,8 +129,8 @@ module ThoughtBot # :nodoc:
           end
 
           def negative_failure_message
-            if @accept_value
-              @accept_value.negative_failure_message
+            if @allow_value
+              @allow_value.negative_failure_message
             else
               if @reject_value
                 @reject_value.failure_message
@@ -179,8 +178,8 @@ module ThoughtBot # :nodoc:
           end
 
           def validate_attribute
-            @reject_value = AttributeMatcher.new.
-              accepting_value(existing_value).
+            @reject_value = AllowValueMatcher.
+              new(existing_value).
               for(@attribute).
               with_message(@expected_message)
             !@reject_value.matches?(@subject)
@@ -201,11 +200,11 @@ module ThoughtBot # :nodoc:
 
                 @subject.send("#{scope}=", next_value)
 
-                @accept_value = AttributeMatcher.new.
-                  accepting_value(existing_value).
+                @allow_value = AllowValueMatcher.
+                  new(existing_value).
                   for(@attribute).
                   with_message(@expected_message)
-                return false unless @accept_value.matches?(@subject)
+                return false unless @allow_value.matches?(@subject)
               end
             end
             true
@@ -216,14 +215,14 @@ module ThoughtBot # :nodoc:
           end
         end
 
-        def accept_value(value)
-          AttributeMatcher.new.accepting_value(value)
+        def allow_value(value)
+          AllowValueMatcher.new(value)
         end
 
         def allow_blank_for(attr)
-          AttributeMatcher.new.
+          AllowValueMatcher.
+            new(nil).
             for(attr).
-            accepting_value(nil).
             with_message(:blank)
         end
 
