@@ -240,19 +240,14 @@ module ThoughtBot # :nodoc:
         #
         def should_ensure_length_at_least(attribute, min_length, opts = {})
           short_message = get_options!([opts], :short_message)
-          short_message ||= default_error_message(:too_short, :count => min_length)
-
           klass = model_class
 
-          if min_length > 0
-            min_value = "x" * (min_length - 1)
-            should "not allow #{attribute} to be less than #{min_length} chars long" do
-              assert_bad_value(klass, attribute, min_value, short_message)
-            end
-          end
-          should "allow #{attribute} to be at least #{min_length} chars long" do
-            valid_value = "x" * (min_length)
-            assert_good_value(klass, attribute, valid_value, short_message)
+          matcher = ensure_length_of(attribute).
+            is_at_least(min_length).
+            with_short_message(short_message)
+
+          should matcher.description do
+            assert_accepts matcher, klass.new
           end
         end
 
