@@ -17,6 +17,22 @@ class ContextTest < Test::Unit::TestCase # :nodoc:
   #   end
   # end
 
+  context "context with evaluate block" do
+    setup { @blah = "blah" }
+    evaluate { @evaluated = @blah }
+
+    should "correctly evaluate @evaluated by using the settings in current and parent setups" do
+      assert_equal @evaluated, "blah"
+    end
+
+    context "in sub-context" do
+      setup { @blah = "bleh" }
+      should "correctly evaluate by using current setup as well" do
+	assert_equal @evaluated, "bleh"
+      end
+    end
+  end
+
   context "context with setup block" do
     setup do
       @blah = "blah"

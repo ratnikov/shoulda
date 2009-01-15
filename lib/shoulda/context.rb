@@ -178,6 +178,7 @@ module Shoulda
     attr_accessor :parent             # may be another context, or the original test::unit class.
     attr_accessor :subcontexts        # array of contexts nested under myself
     attr_accessor :setup_blocks       # blocks given via setup methods
+    attr_accessor :evaluate_blocks    # blocks given via eveluate methods that are run after setup
     attr_accessor :teardown_blocks    # blocks given via teardown methods
     attr_accessor :shoulds            # array of hashes representing the should statements
     attr_accessor :should_eventuallys # array of hashes representing the should eventually statements
@@ -187,6 +188,7 @@ module Shoulda
       self.name               = name
       self.parent             = parent
       self.setup_blocks       = []
+      self.evaluate_blocks    = []
       self.teardown_blocks    = []
       self.shoulds            = []
       self.should_eventuallys = []
@@ -206,6 +208,10 @@ module Shoulda
 
     def setup(&blk)
       self.setup_blocks << blk
+    end
+
+    def evaluate(&blk)
+      self.evaluate_blocks << blk
     end
 
     def teardown(&blk)
@@ -250,6 +256,7 @@ module Shoulda
           context.run_parent_setup_blocks(self)
           should[:before].bind(self).call if should[:before]
           context.run_current_setup_blocks(self)
+	  context.run_all_evaluate_blocks(self)
           should[:block].bind(self).call
         ensure
           context.run_all_teardown_blocks(self)
@@ -272,23 +279,38 @@ module Shoulda
       end
     end
 
+    def run_all_evaluate_blocks(binding)
+      run_parent_evaluate_blocks(binding)
+      run_current_evaluate_blocks(binding)
+    end
+
+    def run_parent_evaluate_blocks(binding)
+      self.parent.run_all_evaluate_blocks(binding) if am_subcontext?
+    end
+
+    def run_current_evaluate_blocks(binding)
+      evaluate_blocks.each do |evaluate_block|
+	evaluate_block.bind(binding).call
+      end
+    end
+
     def run_all_teardown_blocks(binding)
       teardown_blocks.reverse.each do |teardown_block|
-        teardown_block.bind(binding).call
+	teardown_block.bind(binding).call
       end
       self.parent.run_all_teardown_blocks(binding) if am_subcontext?
     end
 
     def print_should_eventuallys
       should_eventuallys.each do |should|
-        test_name = [full_name, "should", "#{should[:name]}. "].flatten.join(' ')
-        puts "  * DEFERRED: " + test_name
+	test_name = [full_name, "should", "#{should[:name]}. "].flatten.join(' ')
+	puts "  * DEFERRED: " + test_name
       end
     end
 
     def build
       shoulds.each do |should|
-        create_test_from_should_hash(should)
+	create_test_from_should_hash(should)
       end
 
       subcontexts.each { |context| context.build }
