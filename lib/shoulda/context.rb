@@ -1,3 +1,5 @@
+require 'shoulda/multiple_contexts'
+
 module Shoulda
   class << self
     attr_accessor :contexts
@@ -170,6 +172,8 @@ module Shoulda
         context.build
       end
     end
+
+    include MultipleContexts
   end
 
   class Context # :nodoc:
