@@ -6,7 +6,7 @@ require 'shoulda/helpers'
 require 'shoulda/rails' if defined? RAILS_ROOT
 
 module Shoulda
-  VERSION = "2.0.6"
+  VERSION = "2.0.6.3"
 end
 
 module Test # :nodoc: all

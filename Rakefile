@@ -52,8 +52,8 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.rdoc", "CONTRIBUTION_GUIDELINES.rdoc"]
   s.rdoc_options     = ["--line-numbers", "--inline-source", "--main", "README.rdoc"]
 
-  s.authors = ["Tammer Saleh"]
-  s.email   = "tsaleh@thoughtbot.com"
+  s.authors = ["Tammer Saleh", "Dmitry Ratnikov"]
+  s.email   = "ratnikov@gmail.com"
 end
 
 Rake::GemPackageTask.new spec do |pkg|
