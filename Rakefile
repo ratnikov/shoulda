@@ -45,7 +45,7 @@ spec = Gem::Specification.new do |s|
   s.homepage          = "http://thoughtbot.com/projects/shoulda"
   s.rubyforge_project = "shoulda"
 
-  s.files       = FileList["[A-Z]*", "{bin,lib,rails,test}/**/*"]
+  s.files       = FileList["[A-Z]*", "{bin,lib,rails,test,tasks}/**/*"] + ['init.rb']
   s.executables = s.files.grep(/^bin/) { |f| File.basename(f) }
 
   s.has_rdoc         = true
