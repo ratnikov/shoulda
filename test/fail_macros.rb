@@ -8,8 +8,8 @@ module Shoulda
     # example, to ensure that a set of test macros should fail, do this:
     #
     #   should_fail do
-    #     should_require_attributes :comments
-    #     should_protect_attributes :name
+    #     should_validate_presence_of :comments
+    #     should_not_allow_mass_assignment_of :name
     #   end
     def should_fail(&block)
       context "should fail when trying to run:" do
