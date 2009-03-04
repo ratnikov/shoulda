@@ -84,7 +84,7 @@ class HelpersTest < Test::Unit::TestCase # :nodoc:
     end
 
     context "after adding another value" do
-      setup do
+      evaluate do
         @a.push(4)
       end
 
@@ -96,7 +96,7 @@ class HelpersTest < Test::Unit::TestCase # :nodoc:
     end
 
     context "after replacing it with an array of strings" do
-      setup do
+      evaluate do
         @a = %w(a b c d e f)
       end
 

@@ -227,22 +227,27 @@ class ShouldTest < Test::Unit::TestCase # :nodoc:
 
   context "A :before proc" do
     setup do
-      assert_equal "before", @value
+      assert_nil @value, "Should not have run the before block before the setup"
       @value = "setup"
     end
 
-    should "run before the current setup", :before => lambda { @value = "before" } do
-      assert_equal "setup", @value
+    evaluate do
+      assert_equal "before", @value
+      @value = "evaluate"
+    end
+
+    should "run after the current setup and before the current evaluate", :before => lambda { @value = "before" } do
+      assert_equal "evaluate", @value
     end
   end
 
   context "a before statement" do
-    setup do
+    evaluate do
       assert_equal "before", @value
-      @value = "setup"
+      @value = "evaluate"
     end
 
-    before_should "run before the current setup" do
+    before_should "run before the current evaluate" do
       @value = "before"
     end
   end
