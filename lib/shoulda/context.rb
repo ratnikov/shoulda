@@ -258,9 +258,8 @@ module Shoulda
       test_unit_class.send(:define_method, test_name) do
         begin
 	  context.run_all_setup_blocks(self)
-	  context.run_parent_evaluate_blocks(self)
           should[:before].bind(self).call if should[:before]
-	  context.run_current_evaluate_blocks(self)
+	  context.run_all_evaluate_blocks(self)
           should[:block].bind(self).call
         ensure
           context.run_all_teardown_blocks(self)
