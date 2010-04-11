@@ -37,7 +37,7 @@ module Shoulda # :nodoc:
   #	- APP_ROOT/test/shoulda_macros
   def self.autoload_macros(root, *dirs)
     dirs << File.join('test')
-    complete_dirs = dirs.map{|d| File.join(root, d, 'shoulda_macros')}
+    complete_dirs = dirs.map{|d| File.join(root.to_s, d, 'shoulda_macros')}
     all_files     = complete_dirs.inject([]){ |files, dir| files + Dir[File.join(dir, '*.rb')] }
     all_files.each do |file|
       require file
