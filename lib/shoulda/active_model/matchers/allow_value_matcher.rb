@@ -1,5 +1,5 @@
 module Shoulda # :nodoc:
-  module ActiveRecord # :nodoc:
+  module ActiveModel # :nodoc:
     module Matchers
 
       # Ensures that the attribute can be set to the given value.

@@ -1,11 +1,11 @@
 module Shoulda # :nodoc:
-  module ActiveRecord # :nodoc:
+  module ActiveModel # :nodoc:
     module Matchers
 
       # Ensures that the model is invalid if the given attribute is not unique.
       #
-      # Internally, this uses values from existing records to test validations,
-      # so this will always fail if you have not saved at least one record for
+      # Internally, this uses values from existing models to test validations,
+      # so this will always fail if you have not saved at least one model for
       # the model being tested, like so:
       #
       #   describe User do

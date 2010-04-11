@@ -3,6 +3,7 @@ require 'active_support'
 require 'shoulda'
 
 require 'shoulda/active_record'     if defined? ActiveRecord::Base
+require 'shoulda/active_model'      if defined? ActiveModel::Base
 require 'shoulda/action_controller' if defined? ActionController::Base
 require 'shoulda/action_view'       if defined? ActionView::Base
 require 'shoulda/action_mailer'     if defined? ActionMailer::Base
