@@ -1,11 +1,14 @@
 class User < ActiveRecord::Base
   has_many :posts
   has_many :dogs, :foreign_key => :owner_id, :class_name => "Pets::Dog"
+  has_many :cats, :foreign_key => :owner_id, :class_name => "Pets::Cat"
 
   has_many :friendships
   has_many :friends, :through => :friendships
 
   has_one :address, :as => :addressable, :dependent => :destroy
+  has_one :registration
+  has_one :profile, :through => :registration
 
   named_scope :old,      :conditions => "age > 50"
   named_scope :eighteen, :conditions => { :age => 18 }
@@ -20,7 +23,8 @@ class User < ActiveRecord::Base
 
   validates_format_of :email, :with => /\w*@\w*.com/
   validates_length_of :email, :in => 1..100
-  validates_inclusion_of :age, :in => 1..100
+  validates_numericality_of :age, :greater_than_or_equal_to => 1,
+                                  :less_than_or_equal_to    => 100
   validates_acceptance_of :eula
   validates_uniqueness_of :email, :scope => :name, :case_sensitive => false
   validates_length_of :ssn, :is => 9, :message => "Social Security Number is not the right length"

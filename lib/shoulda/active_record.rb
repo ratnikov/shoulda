@@ -3,6 +3,7 @@ require 'shoulda/active_record/helpers'
 require 'shoulda/active_record/matchers'
 require 'shoulda/active_record/assertions'
 require 'shoulda/active_record/macros'
+require 'shoulda/active_model'
 
 module Test # :nodoc: all
   module Unit

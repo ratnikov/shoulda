@@ -1,5 +1,13 @@
+require 'shoulda/active_model/matchers'
 require 'shoulda/active_record/matchers'
+require 'shoulda/action_controller/matchers'
+require 'active_support/test_case'
 
-Spec::Runner.configure do |config|
-  config.include Shoulda::ActiveRecord::Matchers, :type => :model
+# :enddoc:
+module ActiveSupport
+  class TestCase
+    include Shoulda::ActiveModel::Matchers
+    include Shoulda::ActiveRecord::Matchers
+    include Shoulda::ActionController::Matchers
+  end
 end

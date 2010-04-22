@@ -4,7 +4,7 @@ require 'posts_controller'
 # Re-raise errors caught by the controller.
 class PostsController; def rescue_action(e) raise e end; end
 
-class PostsControllerTest < Test::Unit::TestCase
+class PostsControllerTest < ActionController::TestCase
   fixtures :all
 
   def setup
@@ -33,30 +33,9 @@ class PostsControllerTest < Test::Unit::TestCase
   should_route :get,    '/users/5/posts/new', :action => :new, :user_id => 5
   should_route :put,    '/users/5/posts/1',   :action => :update, :id => 1, :user_id => 5
 
-  context "The public" do
-    setup do
-      @request.session[:logged_in] = false
-    end
-
-    should_be_restful do |resource|
-      resource.parent = :user
-
-      resource.denied.actions = [:index, :show, :edit, :new, :create, :update, :destroy]
-      resource.denied.flash = /what/i
-      resource.denied.redirect = '"/"'
-    end
-  end
-
   context "Logged in" do
     setup do
       @request.session[:logged_in] = true
-    end
-
-    should_be_restful do |resource|
-      resource.parent = :user
-
-      resource.create.params = { :title => "first post", :body => 'blah blah blah'}
-      resource.update.params = { :title => "changed" }
     end
 
     context "viewing posts for a user" do
@@ -64,12 +43,14 @@ class PostsControllerTest < Test::Unit::TestCase
         get :index, :user_id => users(:first)
       end
       should_respond_with :success
-      should_assign_to :user, :class => User, :equals => 'users(:first)'
+      should_assign_to :user, :class => User
+      should_render_template :index
+      should_assign_to(:user) { users(:first) }
       should_fail do
         should_assign_to :user, :class => Post
       end
       should_fail do
-        should_assign_to :user, :equals => 'posts(:first)'
+        should_assign_to(:user) { posts(:first) }
       end
       should_assign_to :posts
       should_not_assign_to :foo, :bar
@@ -86,8 +67,13 @@ class PostsControllerTest < Test::Unit::TestCase
       should_respond_with_content_type 'application/rss+xml'
       should_respond_with_content_type :rss
       should_respond_with_content_type /rss/
-      should_return_from_session :special, "'$2 off your next purchase'"
-      should_return_from_session :special_user_id, '@user.id'
+      should_set_session(:mischief) { nil }
+      should_set_session(:special) { '$2 off your next purchase' }
+      should_set_session(:special_user_id) { @user.id }
+      should_set_session(:false_var) { false }
+      should_fail do
+        should_set_session(:special_user_id) { 'value' }
+      end
       should_assign_to :user, :posts
       should_not_assign_to :foo, :bar
     end
@@ -95,13 +81,40 @@ class PostsControllerTest < Test::Unit::TestCase
     context "viewing a post on GET to #show" do
       setup { get :show, :user_id => users(:first), :id => posts(:first) }
       should_render_with_layout 'wide'
-      should_render_with_layout :wide
+      context "with a symbol" do # to avoid redefining a test
+        should_render_with_layout :wide
+      end
       should_assign_to :false_flag
+      should_set_the_flash_to nil
+      should_fail do
+        should_set_the_flash_to /.*/
+      end
     end
 
     context "on GET to #new" do
       setup { get :new, :user_id => users(:first) }
       should_render_without_layout
+      should_not_set_the_flash
+      should_render_a_form
+    end
+
+    context "on POST to #create" do
+      setup do
+        post :create, :user_id => users(:first),
+                      :post    => { :title => "first post",
+                                    :body  => 'blah blah blah' }
+      end
+
+      should_redirect_to('the created post') { user_post_url(users(:first),
+                                                             assigns(:post)) }
+      should_fail do
+        should_redirect_to('elsewhere') { user_posts_url(users(:first)) }
+      end
+
+      should_set_the_flash_to /success/
+      should_fail do
+        should_not_set_the_flash
+      end
     end
   end
 
